@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Munna Prajapati — Mathematics Research</title>
+<meta name="description" content="Munna Prajapati — PhD Scholar, Department of Mathematics and Computing, IIT (ISM) Dhanbad. Research interests: Physics-Informed Neural Networks, Support Vector Machines, Scientific AI.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   Tokens
+============================================================ */
+:root{
+  --bg:        #0a0e17;
+  --bg-elev:   #10151f;
+  --bg-elev-2: #151b28;
+  --ink:       #eceef5;
+  --ink-dim:   #97a0b8;
+  --ink-faint: #626b83;
+  --gold:      #c9a227;
+  --gold-soft: #e0c264;
+  --teal:      #35d6c4;
+  --line:      rgba(236,238,245,0.08);
+  --line-soft: rgba(236,238,245,0.05);
+
+  --display: "Fraunces", Georgia, serif;
+  --body:    "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono:    "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+
+  --max-w: 1180px;
+  --edge: clamp(24px, 5vw, 64px);
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *, *::before, *::after{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a{ color: inherit; }
+h1,h2,h3{ font-family: var(--display); margin: 0; font-weight: 500; letter-spacing: -0.01em; }
+
+:focus-visible{
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* faint mathematical grid behind everything */
+.grid-field{
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 90%);
+}
+
+/* ============================================================
+   Header
+============================================================ */
+.site-header{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px var(--edge);
+  backdrop-filter: blur(10px);
+  background: linear-gradient(to bottom, rgba(10,14,23,0.85), transparent);
+}
+
+.brand{
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+}
+
+.site-nav{
+  display: flex;
+  gap: 32px;
+}
+.site-nav a{
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  text-decoration: none;
+  color: var(--ink-dim);
+  letter-spacing: 0.02em;
+  transition: color 0.2s ease;
+}
+.site-nav a:hover, .site-nav a:focus-visible{ color: var(--ink); }
+.site-nav .idx{ color: var(--gold); margin-right: 8px; }
+
+.nav-toggle{
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px; height: 36px;
+  background: none; border: none; cursor: pointer;
+  padding: 0;
+}
+.nav-toggle span{
+  height: 1px; width: 100%;
+  background: var(--ink);
+}
+
+/* ============================================================
+   Hero
+============================================================ */
+.hero{
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 120px var(--edge) 80px;
+}
+
+.hero-canvas-wrap{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+#surface-canvas{
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0.9;
+}
+
+.hero-content{
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+}
+
+.eyebrow{
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--teal);
+  letter-spacing: 0.04em;
+  margin: 0 0 20px;
+  text-transform: uppercase;
+}
+
+.display{
+  font-size: clamp(3rem, 8vw, 5.6rem);
+  line-height: 0.98;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 28px;
+}
+
+.hero-sub{
+  font-size: 1.05rem;
+  color: var(--ink-dim);
+  max-width: 52ch;
+  margin: 0 0 36px;
+}
+.tag-inline{
+  color: var(--ink);
+  border-bottom: 1px solid var(--gold);
+  padding-bottom: 1px;
+}
+
+.hero-actions{ display: flex; gap: 16px; flex-wrap: wrap; }
+
+.btn{
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  text-decoration: none;
+  padding: 14px 24px;
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  display: inline-block;
+}
+.btn-primary{
+  background: var(--gold);
+  color: #14110a;
+  font-weight: 500;
+}
+.btn-primary:hover{ transform: translateY(-2px); background: var(--gold-soft); }
+.btn-ghost{
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+.btn-ghost:hover{ border-color: var(--teal); transform: translateY(-2px); }
+
+.scroll-cue{
+  position: absolute;
+  bottom: 36px;
+  left: var(--edge);
+  z-index: 1;
+  width: 1px;
+  height: 56px;
+  background: var(--line);
+}
+.scroll-cue span{
+  position: absolute;
+  top: 0; left: -2px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: cue-fall 2.2s ease-in-out infinite;
+}
+@keyframes cue-fall{
+  0%{ top: 0; opacity: 0; }
+  20%{ opacity: 1; }
+  90%{ opacity: 1; }
+  100%{ top: 100%; opacity: 0; }
+}
+
+/* ============================================================
+   Sections (shared)
+============================================================ */
+main{ position: relative; z-index: 1; }
+
+.section{
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 120px var(--edge);
+  border-top: 1px solid var(--line);
+}
+
+.section-head{
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  margin-bottom: 48px;
+}
+.mono-index{
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--gold);
+}
+.section-head h2{ font-size: clamp(1.8rem, 3.4vw, 2.4rem); }
+
+.section-note{
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  margin: -28px 0 40px;
+}
+
+/* ============================================================
+   About
+============================================================ */
+.about-grid{
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 56px;
+  align-items: start;
+}
+.about-mark{ padding-top: 6px; }
+.glyph{ width: 100%; height: auto; }
+.glyph-ring{ fill: none; stroke: var(--line); stroke-width: 1; }
+.glyph-curve{ fill: none; stroke: var(--gold); stroke-width: 1.4; }
+.glyph-line{ stroke: var(--teal); stroke-width: 1.4; }
+
+.about-text p{
+  color: var(--ink-dim);
+  font-size: 1.02rem;
+  max-width: 62ch;
+  margin: 0 0 20px;
+}
+.about-text strong{ color: var(--ink); font-weight: 600; }
+
+/* ============================================================
+   Research cards
+============================================================ */
+.research-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.research-card{
+  background: var(--bg);
+  padding: 36px 30px;
+  transition: background 0.25s ease;
+}
+.research-card:hover{ background: var(--bg-elev); }
+
+.research-card-top{ margin-bottom: 18px; }
+.research-tag{
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--teal);
+  border: 1px solid rgba(53,214,196,0.35);
+  padding: 4px 9px;
+  border-radius: 100px;
+}
+.research-card h3{
+  font-size: 1.2rem;
+  margin-bottom: 14px;
+}
+.eq{
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--gold-soft);
+  margin: 0 0 16px;
+}
+.research-card p:not(.eq){
+  color: var(--ink-dim);
+  font-size: 0.94rem;
+}
+
+/* ============================================================
+   Timeline
+============================================================ */
+.timeline{ list-style: none; margin: 0; padding: 0; }
+.timeline-item{
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 32px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.timeline-item:first-child{ padding-top: 0; }
+.timeline-when{
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+  padding-top: 4px;
+}
+.timeline-body h3{ font-size: 1.15rem; margin-bottom: 6px; }
+.timeline-body p{ color: var(--ink-dim); margin: 0; font-size: 0.95rem; }
+
+/* ============================================================
+   Publications
+============================================================ */
+.empty-state{
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  padding: 48px;
+  text-align: center;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 0.88rem;
+}
+
+.pub-list{ list-style: none; margin: 0; padding: 0; }
+.pub-item{
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.pub-title{ font-size: 1.05rem; margin: 0 0 6px; }
+.pub-meta{
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  margin: 0 0 8px;
+}
+.pub-link{
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--teal);
+  text-decoration: none;
+}
+
+/* ============================================================
+   Contact
+============================================================ */
+.contact-grid{
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+}
+.contact-lead{
+  font-size: 1.3rem;
+  font-family: var(--display);
+  color: var(--ink);
+  max-width: 30ch;
+  font-weight: 400;
+}
+.contact-list{ list-style: none; margin: 0; padding: 0; }
+.contact-list li{ border-bottom: 1px solid var(--line-soft); }
+.contact-list a{
+  display: block;
+  padding: 16px 0;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--ink-dim);
+  transition: color 0.2s ease;
+}
+.contact-list a:hover{ color: var(--teal); }
+
+/* ============================================================
+   Footer
+============================================================ */
+.site-footer{
+  padding: 32px var(--edge) 48px;
+  text-align: center;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+/* ============================================================
+   Responsive
+============================================================ */
+@media (max-width: 860px){
+  .site-nav{
+    display: none;
+    position: absolute;
+    top: 100%; right: 0; left: 0;
+    flex-direction: column;
+    gap: 0;
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--line);
+    padding: 8px var(--edge) 18px;
+  }
+  .site-nav.nav-open{ display: flex; }
+  .site-nav a{ padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
+  .nav-toggle{ display: flex; }
+
+  .about-grid{ grid-template-columns: 1fr; }
+  .about-mark{ width: 120px; }
+
+  .research-grid{ grid-template-columns: 1fr; }
+
+  .timeline-item{ grid-template-columns: 1fr; gap: 8px; }
+
+  .contact-grid{ grid-template-columns: 1fr; gap: 28px; }
+
+  .section{ padding: 88px var(--edge); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============ BACKGROUND FIELD ============ -->
+<div class="grid-field" aria-hidden="true"></div>
+
+<!-- ============ HEADER / NAV ============ -->
+<header class="site-header">
+  <a href="#top" class="brand">M. Prajapati</a>
+  <nav class="site-nav">
+    <a href="#about"><span class="idx">01</span>About</a>
+    <a href="#research"><span class="idx">02</span>Research</a>
+    <a href="#education"><span class="idx">03</span>Education</a>
+    <a href="#publications"><span class="idx">04</span>Publications</a>
+    <a href="#contact"><span class="idx">05</span>Contact</a>
+  </nav>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- ============ HERO ============ -->
+<section id="top" class="hero">
+  <div class="hero-canvas-wrap">
+    <canvas id="surface-canvas"></canvas>
+  </div>
+
+  <div class="hero-content">
+    <p class="eyebrow">PhD Scholar · Dept. of Mathematics &amp; Computing · IIT (ISM) Dhanbad</p>
+    <h1 class="display">Munna<br>Prajapati</h1>
+    <p class="hero-sub">
+      Working toward a research career in mathematics, at the intersection of
+      <span class="tag-inline">Physics-Informed Neural Networks</span>,
+      <span class="tag-inline">Support Vector Machines</span> and
+      <span class="tag-inline">Scientific AI</span>.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#research">View research interests</a>
+      <a class="btn btn-ghost" href="#contact">Get in touch</a>
+    </div>
+  </div>
+
+  <a class="scroll-cue" href="#about" aria-label="Scroll to About">
+    <span></span>
+  </a>
+</section>
+
+<main>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about" class="section">
+    <div class="section-head">
+      <span class="mono-index">01</span>
+      <h2>About</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-mark" aria-hidden="true">
+        <svg viewBox="0 0 200 200" class="glyph">
+          <circle cx="100" cy="100" r="92" class="glyph-ring"/>
+          <path d="M30 130 C 70 40, 130 40, 170 130" class="glyph-curve"/>
+          <line x1="35" y1="70" x2="165" y2="130" class="glyph-line"/>
+        </svg>
+      </div>
+      <div class="about-text">
+        <p>
+          I am a first-year PhD scholar in the Department of Mathematics and Computing
+          at IIT (ISM) Dhanbad, working under the supervision of
+          <strong>Dr. Schindhiya Laxmi</strong>. My long-term goal is a research
+          career in applied mathematics, culminating in a professorship built
+          around one of the directions below.
+        </p>
+        <p>
+          I hold an MSc in Mathematics from NIT Jamshedpur and a BSc from
+          Dr Shyam Prasad Mukherjee University, Ranchi. My specific PhD focus
+          is still being finalised with my supervisor — this page will be
+          updated as that direction is confirmed.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESEARCH ============ -->
+  <section id="research" class="section">
+    <div class="section-head">
+      <span class="mono-index">02</span>
+      <h2>Research Interests</h2>
+    </div>
+    <p class="section-note">
+      Three directions under my supervisor's guidance — my specific focus
+      within these is not yet finalised.
+    </p>
+
+    <div class="research-grid">
+
+      <article class="research-card">
+        <div class="research-card-top">
+          <span class="research-tag">Exploring</span>
+        </div>
+        <h3>Physics-Informed Neural Networks</h3>
+        <p class="eq">u<sub>t</sub> + N[u; λ] = 0</p>
+        <p>
+          Embedding governing differential equations directly into neural
+          network training, so that models respect the physics of a system
+          rather than only fitting data.
+        </p>
+      </article>
+
+      <article class="research-card">
+        <div class="research-card-top">
+          <span class="research-tag">Exploring</span>
+        </div>
+        <h3>Support Vector Machines</h3>
+        <p class="eq">min ½‖w‖² + C Σξᵢ</p>
+        <p>
+          Margin-based learning theory and optimal separating hyperplanes —
+          the classical, geometry-driven side of statistical learning.
+        </p>
+      </article>
+
+      <article class="research-card">
+        <div class="research-card-top">
+          <span class="research-tag">Exploring</span>
+        </div>
+        <h3>Scientific AI</h3>
+        <p class="eq">f: X → Y, ‖f − f*‖ → 0</p>
+        <p>
+          Machine learning methods designed for scientific computing —
+          surrogate modelling, operator learning, and data-driven discovery
+          of governing equations.
+        </p>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ EDUCATION ============ -->
+  <section id="education" class="section">
+    <div class="section-head">
+      <span class="mono-index">03</span>
+      <h2>Education</h2>
+    </div>
+
+    <ol class="timeline">
+      <li class="timeline-item">
+        <div class="timeline-when">2025 — Present</div>
+        <div class="timeline-body">
+          <h3>PhD, Mathematics and Computing</h3>
+          <p>IIT (ISM) Dhanbad · Supervisor: Dr. Schindhiya Laxmi</p>
+        </div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-when">MSc</div>
+        <div class="timeline-body">
+          <h3>Mathematics</h3>
+          <p>NIT Jamshedpur</p>
+        </div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-when">BSc</div>
+        <div class="timeline-body">
+          <h3>Mathematics</h3>
+          <p>Dr Shyam Prasad Mukherjee University, Ranchi</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ PUBLICATIONS ============ -->
+  <section id="publications" class="section">
+    <div class="section-head">
+      <span class="mono-index">04</span>
+      <h2>Publications</h2>
+    </div>
+
+    <!--
+      UPDATE HERE: once you have publications, replace .empty-state below
+      with a <ul class="pub-list"> of <li class="pub-item"> entries.
+      A template item is left commented out for reuse.
+
+      <ul class="pub-list">
+        <li class="pub-item">
+          <p class="pub-title">Paper title goes here</p>
+          <p class="pub-meta">Authors · Venue, Year</p>
+          <a class="pub-link" href="#">View paper →</a>
+        </li>
+      </ul>
+    -->
+    <div class="empty-state">
+      <p>No publications yet — this section will grow as the research does.</p>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="section">
+    <div class="section-head">
+      <span class="mono-index">05</span>
+      <h2>Contact</h2>
+    </div>
+    <div class="contact-grid">
+      <p class="contact-lead">
+        Open to conversations on PINNs, SVMs, and scientific AI —
+        reach out any time.
+      </p>
+      <ul class="contact-list">
+        <!-- UPDATE: replace placeholders with your real links -->
+        <li><a href="mailto:your.email@example.com">your.email@example.com</a></li>
+        <li><a href="https://github.com/your-username" target="_blank" rel="noopener">GitHub ↗</a></li>
+        <li><a href="https://scholar.google.com/" target="_blank" rel="noopener">Google Scholar ↗</a></li>
+        <li><a href="https://linkedin.com/in/your-profile" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>© <span id="year"></span> Munna Prajapati · Department of Mathematics and Computing, IIT (ISM) Dhanbad</p>
+</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from "three";
+
+const canvas = document.getElementById("surface-canvas");
+if (canvas) {
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
+  camera.position.set(0.8, 1.1, 12.5);
+  camera.lookAt(0.8, 0, 0);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  // ---- Layered neural network: nodes as spheres, edges as line
+  // segments. Nodes drift and "fire" continuously (an evolving
+  // network, not a static prop) while the whole group rotates,
+  // reinforcing the 3D read. Colour drifts from gold (input) to
+  // teal (output) across depth.
+  const LAYER_SIZES = [7, 11, 13, 11, 7, 4];
+  const LAYER_GAP = 2.05;
+  const totalWidth = (LAYER_SIZES.length - 1) * LAYER_GAP;
+
+  const goldColor = new THREE.Color(0xc9a227);
+  const tealColor = new THREE.Color(0x35d6c4);
+
+  const nodeGeo = new THREE.SphereGeometry(0.075, 14, 14);
+  const layers = []; // [{ nodes: [...], color }]
+  const nodes = [];  // flat list for animation: { pos, basePos, mesh, phase, freqY, freqZ, ampY, ampZ, freqPulse }
+
+  LAYER_SIZES.forEach((count, li) => {
+    const x = -totalWidth / 2 + li * LAYER_GAP;
+    const t = li / (LAYER_SIZES.length - 1);
+    const color = goldColor.clone().lerp(tealColor, t);
+    const mat = new THREE.MeshBasicMaterial({ color });
+
+    const layerNodes = [];
+    const spread = 0.55 + count * 0.24;
+    for (let i = 0; i < count; i++) {
+      const frac = count === 1 ? 0.5 : i / (count - 1);
+      const y = (frac - 0.5) * spread;
+      const z = (Math.random() - 0.5) * 1.5;
+      const jitterX = (Math.random() - 0.5) * 0.16;
+      const basePos = new THREE.Vector3(x + jitterX, y, z);
+      const pos = basePos.clone();
+
+      const mesh = new THREE.Mesh(nodeGeo, mat);
+      mesh.position.copy(pos);
+      group.add(mesh);
+
+      const node = {
+        pos,
+        basePos,
+        mesh,
+        phase: Math.random() * Math.PI * 2,
+        freqY: 0.35 + Math.random() * 0.5,
+        freqZ: 0.3 + Math.random() * 0.5,
+        ampY: 0.09 + Math.random() * 0.08,
+        ampZ: 0.14 + Math.random() * 0.12,
+        freqPulse: 0.8 + Math.random() * 1.4,
+      };
+      nodes.push(node);
+      layerNodes.push(node);
+    }
+    layers.push({ nodes: layerNodes, color });
+  });
+
+  // ---- Edges between adjacent layers (positions re-synced every frame)
+  const edgeList = []; // { a: Vector3 (node.pos), b: Vector3 (node.pos) }
+  const edgeColors = [];
+
+  for (let li = 0; li < layers.length - 1; li++) {
+    const from = layers[li];
+    const to = layers[li + 1];
+    from.nodes.forEach((na) => {
+      to.nodes.forEach((nb) => {
+        edgeList.push({ a: na.pos, b: nb.pos });
+        const c1 = from.color;
+        const c2 = to.color;
+        edgeColors.push(c1.r, c1.g, c1.b, c2.r, c2.g, c2.b);
+      });
+    });
+  }
+
+  const edgeVertCount = edgeList.length * 2;
+  const edgePositions = new Float32Array(edgeVertCount * 3);
+  const edgeGeo = new THREE.BufferGeometry();
+  edgeGeo.setAttribute("position", new THREE.BufferAttribute(edgePositions, 3));
+  edgeGeo.setAttribute("color", new THREE.Float32BufferAttribute(edgeColors, 3));
+  const edgeMat = new THREE.LineBasicMaterial({
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.18,
+  });
+  const edgeMesh = new THREE.LineSegments(edgeGeo, edgeMat);
+  group.add(edgeMesh);
+
+  function syncEdgeGeometry() {
+    const arr = edgeGeo.attributes.position.array;
+    edgeList.forEach((e, i) => {
+      const o = i * 6;
+      arr[o] = e.a.x; arr[o + 1] = e.a.y; arr[o + 2] = e.a.z;
+      arr[o + 3] = e.b.x; arr[o + 4] = e.b.y; arr[o + 5] = e.b.z;
+    });
+    edgeGeo.attributes.position.needsUpdate = true;
+  }
+  syncEdgeGeometry();
+
+  // ---- Pulses: bright points travelling along a sample of edges,
+  // signalling forward passes through the network.
+  const PULSE_COUNT = 46;
+  const pulseGeo = new THREE.BufferGeometry();
+  const pulsePositions = new Float32Array(PULSE_COUNT * 3);
+  pulseGeo.setAttribute("position", new THREE.BufferAttribute(pulsePositions, 3));
+  const pulseMat = new THREE.PointsMaterial({
+    color: 0xf3ead1,
+    size: 0.12,
+    transparent: true,
+    opacity: 0.95,
+  });
+  const pulsePoints = new THREE.Points(pulseGeo, pulseMat);
+  group.add(pulsePoints);
+
+  const pulses = Array.from({ length: PULSE_COUNT }, () => ({
+    edge: edgeList[Math.floor(Math.random() * edgeList.length)],
+    t: Math.random(),
+    speed: 0.006 + Math.random() * 0.012,
+  }));
+
+  function updatePulses() {
+    const arr = pulseGeo.attributes.position.array;
+    pulses.forEach((p, i) => {
+      p.t += p.speed;
+      if (p.t >= 1) {
+        p.t = 0;
+        p.edge = edgeList[Math.floor(Math.random() * edgeList.length)];
+      }
+      const { a, b } = p.edge;
+      arr[i * 3] = a.x + (b.x - a.x) * p.t;
+      arr[i * 3 + 1] = a.y + (b.y - a.y) * p.t;
+      arr[i * 3 + 2] = a.z + (b.z - a.z) * p.t;
+    });
+    pulseGeo.attributes.position.needsUpdate = true;
+  }
+
+  group.scale.setScalar(1.18);
+  group.position.set(2.1, -0.15, 0);
+  let spin = -0.4;
+  group.rotation.y = spin;
+
+  // ---- pointer parallax (adds to, rather than replaces, the
+  // network's own continuous rotation)
+  let parallaxY = 0;
+  let parallaxX = 0.06;
+  window.addEventListener("pointermove", (e) => {
+    const nx = e.clientX / window.innerWidth - 0.5;
+    const ny = e.clientY / window.innerHeight - 0.5;
+    parallaxY = nx * 0.55;
+    parallaxX = 0.06 + ny * 0.22;
+  });
+
+  function resize() {
+    const wrap = canvas.parentElement;
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  const clock = new THREE.Clock();
+  let raf;
+  function animate() {
+    raf = requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    if (!prefersReducedMotion) {
+      // continuous auto-rotation, nudged further by pointer parallax
+      spin += 0.0032;
+      group.rotation.y = spin + parallaxY * 0.4;
+      group.rotation.x += (parallaxX - group.rotation.x) * 0.03;
+
+      // network "evolves": nodes drift and pulse, edges and signals
+      // re-sync to the moving nodes every frame
+      nodes.forEach((n) => {
+        n.pos.y = n.basePos.y + Math.sin(t * n.freqY + n.phase) * n.ampY;
+        n.pos.z = n.basePos.z + Math.cos(t * n.freqZ + n.phase) * n.ampZ;
+        n.mesh.position.copy(n.pos);
+        const pulseScale = 1 + 0.45 * Math.max(0, Math.sin(t * n.freqPulse + n.phase));
+        n.mesh.scale.setScalar(pulseScale);
+      });
+      syncEdgeGeometry();
+      updatePulses();
+    }
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) cancelAnimationFrame(raf);
+    else animate();
+  });
+}
+
+</script>
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+
+const navToggle = document.getElementById("navToggle");
+const siteNav = document.querySelector(".site-nav");
+
+if (navToggle && siteNav) {
+  navToggle.addEventListener("click", () => {
+    const isOpen = siteNav.classList.toggle("nav-open");
+    navToggle.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  siteNav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      siteNav.classList.remove("nav-open");
+      navToggle.setAttribute("aria-expanded", "false");
+    });
+  });
+}
+
+</script>
+</body>
+</html>
